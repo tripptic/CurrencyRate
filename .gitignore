@@ -9,3 +9,7 @@
 /vendor/
 /logs/
 ###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/tests/.phpunit.result.cache
+###< phpunit/phpunit ###

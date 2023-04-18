@@ -7,10 +7,10 @@ use DateTime;
 interface RatesProviderInterface
 {
     /**
+     * @param DateTime $date
      * @param string $currencyCode
      * @param string $baseCurrencyCode
-     * @param DateTime $date
      * @return float|null
      */
-    public function getRate(string $currencyCode, string $baseCurrencyCode, DateTime $date): ?float;
+    public function getRate(DateTime $date, string $currencyCode, string $baseCurrencyCode): ?float;
 }

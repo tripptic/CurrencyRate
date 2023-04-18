@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 
 class CurrencyService
 {
-    protected const RATES_QUEUE_NAME = 'exchange_rates_queue';
+    public const RATES_QUEUE_NAME = 'exchange_rates_queue';
 
     /**
      * @var RatesProviderInterface
@@ -50,7 +50,7 @@ class CurrencyService
      */
     public function fetchExchangeRate(DateTime $date, string $currencyCode, string $baseCurrencyCode = 'RUR'): ?float
     {
-        return $this->currencyRateProvider->getRate($currencyCode, $baseCurrencyCode, $date);
+        return $this->currencyRateProvider->getRate($date, $currencyCode, $baseCurrencyCode);
     }
 
     /**
@@ -98,7 +98,7 @@ class CurrencyService
 
                 $rate = $this->fetchExchangeRate($date, $currencyCode, $baseCurrencyCode);
                 $previousDate = $this->getPreviousDate($date);
-                $previousRate = $this->currencyRateProvider->getRate($currencyCode, $baseCurrencyCode, $previousDate);
+                $previousRate = $this->currencyRateProvider->getRate($previousDate, $currencyCode, $baseCurrencyCode);
 
                 $outputCallback(new ExchangeRateResult($rate, $previousRate));
             } catch (Exception $e) {

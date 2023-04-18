@@ -26,6 +26,9 @@ class CbrCurrencyRateProvider implements RatesProviderInterface
      */
     private const CBR_DAILY_URL = 'https://www.cbr.ru/scripts/XML_daily.asp?date_req=%s';
 
+    /**
+     * @var string
+     */
     public const BASE_CURRENCY_CODE = 'RUR';
 
     /**
@@ -51,11 +54,11 @@ class CbrCurrencyRateProvider implements RatesProviderInterface
     /**
      * @param string $currencyCode
      * @param string $baseCurrencyCode
-     * @param DateTime|null $date
+     * @param DateTime $date
      * @return float|null
      * @throws InvalidArgumentException|GuzzleException
      */
-    public function getRate(string $currencyCode, string $baseCurrencyCode = self::BASE_CURRENCY_CODE, ?DateTime $date = null): ?float
+    public function getRate(DateTime $date, string $currencyCode, string $baseCurrencyCode = self::BASE_CURRENCY_CODE): ?float
     {
         try {
             $cacheKey = $this->createCacheKey($currencyCode, $baseCurrencyCode, $date);
