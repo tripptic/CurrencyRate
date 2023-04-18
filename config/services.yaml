@@ -1,0 +1,39 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    App\:
+        resource: '../src/*'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Tests/'
+
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
+
+    App\Provider\CbrCurrencyRateProvider:
+        arguments:
+            - '@cache.app'
+            - '@Psr\Log\LoggerInterface'
+
+    PhpAmqpLib\Connection\AMQPStreamConnection:
+        class: PhpAmqpLib\Connection\AMQPStreamConnection
+        arguments: ['%env(RABBITMQ_HOST)%', '%env(RABBITMQ_PORT)%', '%env(RABBITMQ_USER)%', '%env(RABBITMQ_PASSWORD)%']
+
+    App\Service\MessageBrokerServiceInterface:
+        class: App\Service\RabbitMQMessageBrokerService
+        arguments:
+            - '@PhpAmqpLib\Connection\AMQPStreamConnection'
+
+    App\Service\CurrencyService:
+        arguments:
+            - '@App\Provider\CbrCurrencyRateProvider'
+            - '@App\Service\MessageBrokerServiceInterface'
+            - '@Psr\Log\LoggerInterface'
+imports:
+    - { resource: packages/monolog.yaml }
