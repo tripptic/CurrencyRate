@@ -13,3 +13,5 @@
 ###> phpunit/phpunit ###
 /tests/.phpunit.result.cache
 ###< phpunit/phpunit ###
+
+.idea
