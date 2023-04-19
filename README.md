@@ -3,7 +3,7 @@
 Приложение для получения курса валюты на определенную дату.
 
 ### Инструкция по разворачиванию:
-1. Скопировать ./docker/.env.dist в ./docker/.env. Если нужно, изменить значения переменных.
+1. Скопировать ./docker/.env.dist в ./docker/.env.
 ```bash
 cp ./docker/.env.dist ./docker/.env
 ```
@@ -21,11 +21,13 @@ php bin/console app:fetch-exchange-rates [дата] [валюта] [базова
 ```
 
 ### Пример запуска:
+из директории /docker
 ```bash
 docker-compose exec app php bin/console app:fetch-exchange-rates 16.05.2021 EUR USD
 ```
 
 ### Запуск тестов:
+из директории /docker
 ```bash
 docker-compose exec app vendor/bin/phpunit -c tests/phpunit.xml
 ```
