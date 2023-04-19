@@ -6,10 +6,14 @@ use App\Model\ExchangeRateResult;
 use App\Provider\RatesProviderInterface;
 use DateTime;
 use Exception;
+use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
 
 class CurrencyService
 {
+    /**
+     * @var string
+     */
     public const RATES_QUEUE_NAME = 'exchange_rates_queue';
 
     /**
@@ -76,7 +80,7 @@ class CurrencyService
      * @param callback $outputCallback
      * @return void
      */
-    public function fetchRatesWithQueue(DateTime $date, string $currencyCode, string $baseCurrencyCode, $outputCallback): void
+    public function fetchRatesWithQueue(DateTime $date, string $currencyCode, string $baseCurrencyCode, callable $outputCallback): void
     {
         $message = json_encode([
             'date' => $date->format('d.m.Y'),
@@ -88,9 +92,9 @@ class CurrencyService
 
         $this->messageBrokerService->send(self::RATES_QUEUE_NAME, $message);
 
-        $this->messageBrokerService->receive(self::RATES_QUEUE_NAME, function ($msg) use ($outputCallback) {
+        $this->messageBrokerService->receive(self::RATES_QUEUE_NAME, function (AMQPMessage $msg) use ($outputCallback) {
             try {
-                $data = json_decode($msg->body, true);
+                $data = json_decode($msg->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
                 $date = DateTime::createFromFormat('d.m.Y', $data['date']);
                 $currencyCode = $data['currency'];
@@ -98,7 +102,7 @@ class CurrencyService
 
                 $rate = $this->fetchExchangeRate($date, $currencyCode, $baseCurrencyCode);
                 $previousDate = $this->getPreviousDate($date);
-                $previousRate = $this->currencyRateProvider->getRate($previousDate, $currencyCode, $baseCurrencyCode);
+                $previousRate = $this->fetchExchangeRate($previousDate, $currencyCode, $baseCurrencyCode);
 
                 $outputCallback(new ExchangeRateResult($rate, $previousRate));
             } catch (Exception $e) {

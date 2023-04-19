@@ -137,7 +137,7 @@ class CbrCurrencyRateProvider implements RatesProviderInterface
         }
 
         $dom = new DOMDocument();
-        @$dom->loadXML($xmlContent);
+        $dom->loadXML($xmlContent);
 
         $xpath = new DOMXPath($dom);
         $currencyNode = $this->findCurrencyCodeNode($xpath, $currency);
@@ -152,7 +152,7 @@ class CbrCurrencyRateProvider implements RatesProviderInterface
             $exchangeRate = ($exchangeRate / $baseExchangeRate) * ($baseNominal / $nominal);
         }
 
-        return $exchangeRate;
+        return number_format($exchangeRate, 4);
     }
 
     /**
@@ -195,10 +195,10 @@ class CbrCurrencyRateProvider implements RatesProviderInterface
 
     /**
      * @param DOMNodeList $currencyNode
-     * @return int
+     * @return float
      * @throws Exception
      */
-    private function parseNominal(DOMNodeList $currencyNode): int
+    private function parseNominal(DOMNodeList $currencyNode): float
     {
         $rate = $currencyNode->item(0)?->getElementsByTagName('Nominal')?->item(0)?->nodeValue;
         if (is_null($rate)) {

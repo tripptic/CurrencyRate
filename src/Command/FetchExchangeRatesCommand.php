@@ -7,6 +7,7 @@ use App\Service\CurrencyService;
 use DateTime;
 use Exception;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,15 +35,23 @@ class FetchExchangeRatesCommand extends Command
     private ValidatorInterface $validator;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * @param CurrencyService $currencyService
      * @param ValidatorInterface $validator
+     * @param LoggerInterface $logger
      */
     public function __construct(
         CurrencyService $currencyService,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        LoggerInterface $logger
     ) {
         $this->currencyService = $currencyService;
         $this->validator = $validator;
+        $this->logger = $logger;
         parent::__construct();
     }
 
@@ -102,6 +111,7 @@ class FetchExchangeRatesCommand extends Command
             $output->writeln('<error>' . $e->getMessage() . '</error>');
         } catch (Exception $e) {
             $output->writeln('<error>Failed to get exchange rates. Try later.</error>');
+            $this->logger->error($e->getMessage());
         }
 
         return Command::SUCCESS;
